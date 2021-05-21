@@ -19,7 +19,7 @@ class Page{
         "data"=>[]
     ];
 
-    public function __construct($opts = array())
+    public function __construct($opts = array(), $tpl_dir = "/views/")
     {
         /** será mesclado o array defaults e opts no array options
          * caso não seja informado nada será considerado o defaults
@@ -30,7 +30,7 @@ class Page{
             /**aqui vamos configurar qual o caminho onde
              * estarão as paginas
              */
-            "tpl_dir"       => $_SERVER["DOCUMENT_ROOT"]."/views/",
+            "tpl_dir"       => $_SERVER["DOCUMENT_ROOT"].$tpl_dir,
             "cache_dir"     => $_SERVER["DOCUMENT_ROOT"]."/views-cache/",
             "debug"         => false // set to false to improve the speed
         );
