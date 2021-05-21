@@ -15,7 +15,10 @@ class Page{
 
     private $tpl;
     private $options = [];
+    //criando opcao de desabilidar o header e o footer
     private $defaults = [
+        "footer"=>true,
+        "header"=>true,
         "data"=>[]
     ];
 
@@ -48,7 +51,8 @@ class Page{
         $this->setData($this->options["data"]);
         
         //abrirá o arquivo header que estará na pasta /views/
-        $this->tpl->draw("header");
+        //isto se a opção header for true
+        if($this->options["header"] === true) $this->tpl->draw("header");
 
     }
 
@@ -78,7 +82,7 @@ class Page{
     public function __destruct()
     {
 
-        $this->tpl->draw("footer");
+        if($this->options["footer"] === true) $this->tpl->draw("footer");
     }
 }
 
