@@ -2,8 +2,8 @@
 
 namespace Hcode;
 
+/**classe de renderização de template do php */
 use Rain\Tpl;
-//use phpmailer\phpmailer\src\PHPMailer;
 
 /**Nesta classe iremos passar alguns argumentos
  * O endereço que iremos enviar, nome do destinatário,
@@ -11,8 +11,8 @@ use Rain\Tpl;
  */
 class Mailer
 {
-    const USERNAME = "xxxxxxxx@gmail.com";
-    const PASSWORD = "xxxxxx";
+    const USERNAME = "x@gmail.com";
+    const PASSWORD = "xx";
     const NAMEFROM = "Hcode Store";
 
     private $mail;
