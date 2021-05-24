@@ -26,7 +26,8 @@ class Model
         switch ($method) 
         {
             case 'get':
-                return $this->values[$fieldName];
+                //pelo ternario vamos validar se já existe o valor do campo, se não existir ele retornará nulo
+                return (isset( $this->values[$fieldName]) ? $this->values[$fieldName] : NULL);
                 break;
             case 'set':
                 $this->values[$fieldName] = $arguments[0];
