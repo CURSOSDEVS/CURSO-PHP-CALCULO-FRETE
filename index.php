@@ -432,6 +432,22 @@ $app->post('/admin/categories/:idcategory', function($idcategory)
 
 });
 
+///////////////////////////////////////////////////////////
+/**Rota para carregar a pagina  categoria específica*/
+$app->get('/categories/:idcategory', function($idcategory)
+{
+	$category = new Category();
+	
+	$category->get((int)$idcategory);
+	
+	//vamos agora utilizar a classe Page que carregara o template somente da categoria do produto
+	$page = new Page();
+	$page->setTpl("category", [
+		'category'=>$category->getValues(),
+		'products'=>[]
+	]);
+});
+
 //////////////////////////////////////////////////////////
 $app->run();
 

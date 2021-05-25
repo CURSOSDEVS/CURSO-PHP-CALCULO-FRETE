@@ -29,6 +29,9 @@ class Category extends Model
 
         $this->setData($results[0]);
 
+        //chamamos o método updateFile para atualizar lista de categorias da página html
+        Category::updateFile();
+
     }
 
     /**metodo para carregar uma categoria pelo id */
@@ -52,6 +55,30 @@ class Category extends Model
             ':idcategory'=>$this->getidcategory()]
         );
 
+        //chamamos o método updateFile para atualizar lista de categorias da página html
+        Category::updateFile();
+    }
+
+    /**Metodo estatico para atualizar as categorias na página html principal sempre que
+     * for atualizado o menu de categorias
+    */
+    public static function updateFile()
+    {
+        //busca do banco de dados as categorias cadastradas
+        $categories = Category::listAll();
+
+        //vamos criar a lista de menu dinâmicamente
+        $html = [];
+
+        //percorrendo o array categories e incluindo em cada valor as tags
+        foreach ($categories as $row) {
+            array_push($html, '<li><a href="/categories/'.$row['idcategory'].'">'.$row['descategory'].'</a></li>');
+        }
+
+        //salvando o arquivo no caminho onde está sendo executado o programa e transformando o array numa string 
+        //com a função implode
+        file_put_contents($_SERVER['DOCUMENT_ROOT'].DIRECTORY_SEPARATOR.
+        'views'.DIRECTORY_SEPARATOR.'categories-menu.html', implode('',$html));
     }
 
 
