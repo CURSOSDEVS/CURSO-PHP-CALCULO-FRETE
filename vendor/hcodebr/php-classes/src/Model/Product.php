@@ -16,6 +16,23 @@ class Product extends Model
         return $results;
     }
 
+    //método para verificar se na lista possui a foto e se nao incluir nos dados passados para
+    //a página
+    public static function checkList($list)
+    {
+        //percorre o array dos produtos buscados e como no banco de dados 
+        //não existe a informação da foto, esta informação
+        foreach ($list as &$row) {
+            $p = new Product();
+            $p->setData($row);
+
+            //alteramos a o valor da linha com o valor da url setada no método checkphoto 
+            //que está dentro do método getValues
+            $row = $p->getValues();
+        }
+        //retorna o array list com os dados já tratados
+        return $list;
+    }
 
     /**metodo para criar os produtos */
     public function save()
