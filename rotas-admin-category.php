@@ -3,7 +3,8 @@
 use \Hcode\Page;
 use \Hcode\PageAdmin;
 use \Hcode\Model\User;
-use Hcode\Model\Category;
+use \Hcode\Model\Category;
+use \Hcode\Model\Product;
 
 ////////////////////////////////////////////////////////////////////////
 /**criando rota para acessar o template de categorias */
@@ -115,20 +116,71 @@ $app->post('/admin/categories/:idcategory', function($idcategory)
 
 });
 
-///////////////////////////////////////////////////////////
-/**Rota para carregar a pagina  categoria específica*/
-$app->get('/categories/:idcategory', function($idcategory)
+
+
+//////////////////////////////////////////////////////////////
+//rota para acessar a tela de correlação de produtos e categorias
+$app->get('/admin/categories/:idcategory/products', function($idcategory)
 {
+	User::verifyLogin();
+
 	$category = new Category();
-	
+
+	$category->get((int)$idcategory);
+
+	$page = new PageAdmin();
+
+	//utilizando o método getProducts da classe Category, buscamos todos os produtos que estão
+	//relacionados a categoria e os que não estão para carregarmos no template
+	$page->setTpl('categories-products', [
+		'category'=>$category->getValues(),
+		'productsNotRelated'=>$category->getProducts(false),
+		'productsRelated'=>$category->getProducts()
+	]);
+});
+
+
+/////////////////////////////////////////////////////////////////////
+//rota para adicionar produtos nas categorias
+$app->get('/admin/categories/:idcategory/products/:idproduct/add', function($idcategory, $idproduct)
+{
+
+	User::verifyLogin();
+
+	$category = new Category();
+
 	$category->get((int)$idcategory);
 	
-	//vamos agora utilizar a classe Page que carregara o template somente da categoria do produto
-	$page = new Page();
-	$page->setTpl("category", [
-		'category'=>$category->getValues(),
-		'products'=>[]
-	]);
+	$product = new Product();
+
+	$product->get((int)$idproduct);
+
+	$category->addProducts($product);
+
+	header("Location: /admin/categories/".$idcategory."/products");
+	exit;
+
+});
+
+/////////////////////////////////////////////////////////////////////
+//rota para remover produtos nas categorias
+$app->get('/admin/categories/:idcategory/products/:idproduct/remove', function($idcategory, $idproduct)
+{
+	User::verifyLogin();
+
+	$category = new Category();
+
+	$category->get((int)$idcategory);
+	
+	$product = new Product();
+
+	$product->get((int)$idproduct);
+
+	$category->removeProducts($product);
+
+	header("Location: /admin/categories/".$idcategory."/products");
+	exit;
+
 });
 
 ?>

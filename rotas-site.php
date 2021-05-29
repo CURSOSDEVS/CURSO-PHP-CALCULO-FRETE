@@ -2,6 +2,7 @@
 
 use \Hcode\Page;
 use \Hcode\Model\Product;
+use \Hcode\Model\Category;
 
 //inicio da primeira rota
 $app->get('/', function() {
@@ -19,6 +20,26 @@ $app->get('/', function() {
 		'products'=>$products
 	]);
 
+});
+
+///////////////////////////////////////////////////////////
+/**Rota para carregar a pagina  categoria específica*/
+$app->get('/categories/:idcategory', function($idcategory)
+{
+	
+	$category = new Category();
+	
+	$category->get((int)$idcategory);
+
+	//vamos agora utilizar a classe Page que carregara o template somente da categoria do produto
+	$page = new Page();
+	
+	//utilizaremos o método estático checklist que verificará se o objeto
+	//possui o caminho da foto se não tiver será adicionado
+	$page->setTpl("category", [
+		'category'=>$category->getValues(),
+		'products'=>Product::checkList($category->getProducts())]
+	);
 });
 
 ?>

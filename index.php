@@ -19,6 +19,7 @@ require_once("rotas-admin-user.php");
 require_once("rotas-admin-category.php");
 require_once("rotas-admin-products.php");
 
+
 //configura mensagem de erro
 $app->config('debug', true);
 
