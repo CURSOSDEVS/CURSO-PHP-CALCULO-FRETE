@@ -115,6 +115,45 @@ class Category extends Model
 
     }
 
+    //metodo que irá fazer a paginação dos produtos por categoria
+    //receberá dois parâmetros que será a página e a quantidade de itens
+    //por página
+    public function getProductsPage($page = 1, $itemsPerPage = 3)
+    {   
+        //variável que terá a quantidade de itens por página
+        $start = ($page - 1 ) * $itemsPerPage;    
+
+        $sql = new Sql();
+    
+        //resultado dos produdos da categori em cada página
+        $results = $sql->select('SELECT SQL_CALC_FOUND_ROWS *
+                                 FROM tb_products a 
+                                 INNER JOIN tb_productscategories b
+                                 ON a.idproduct = b.idproduct
+                                 INNER JOIN tb_categories c
+                                 ON c.idcategory = b.idcategory
+                                 WHERE c.idcategory = :idcategory
+                                 LIMIT '.$start.', '.$itemsPerPage.';'
+                                 , [
+                                     ':idcategory'=>$this->getidcategory()                                    
+                
+                                     ]);            
+                                    
+        //total de produdos na categoria
+        $resultsTotal = $sql->select('SELECT FOUND_ROWS() AS nrtotal');
+        
+        //o método estático de produtos inclui a informação da foto no 
+        //objetos
+        return [
+            'data'=>Product::checkList($results),
+            'total'=>(int)$resultsTotal[0]['nrtotal'],
+            //pages ira retornar o número total de páginas
+            'pages'=>ceil($resultsTotal[0]['nrtotal']/$itemsPerPage)
+        ];
+    }
+
+        
+
     //metodo para adicionar produtos a categoria informada
     public function addProducts(Product $product)
     {
