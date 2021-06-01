@@ -61,4 +61,24 @@ $app->get('/categories/:idcategory', function($idcategory)
 		]);
 });
 
+////////////////////////////////////////////////////////////
+/**Rota para ver a descrição das características do produto */
+$app->get('/products/:desurl', function($desurl)
+{
+	$product = new Product();
+
+	//método da classe produto que irá retornar o objeto com a url informada
+	$product->getFromUrl($desurl);
+
+	$page = new Page();
+
+	$page->setTpl('product-detail', [
+		'product'=>$product->getValues(),
+		'categories'=>$product->getCategories()//metodo criado na classe Product para iformar quais as categorias o produto está relacionado
+		
+	]);
+
+}
+);
+
 ?>
