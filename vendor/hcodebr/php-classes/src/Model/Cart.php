@@ -12,7 +12,7 @@ class Cart extends Model
 
     //constante que irá armazenar a sessão atual para ser utilizada na 
     //inserção do carrinho
-    const SESSION = "CartSession";
+    const SESSION = "Cart";
 
     //método estático que irá verificar se existe uma sessão aberta e 
     //se o id da sessão ainda é valido.
@@ -67,6 +67,8 @@ class Cart extends Model
                 
             }
         }
+
+        return $cart;
     }
 
     //colamos o carrinho na sessão para que não seja 
@@ -127,6 +129,73 @@ class Cart extends Model
                 ]);
 
         $this->setData($results[0]);
+    }
+
+    //metodo para adiconar produtos ao carrinho
+    public function addProducts(Product $product)
+    {
+        $sql = new Sql();
+
+        $sql->query('INSERT INTO tb_cartsproducts (idcart, idproduct) VALUES (:idcart, :idproduct)', [
+                ':idcart'=>$this->getidcart(),
+                ':idproduct'=>$product->getidproduct()
+        ]);
+
+    }
+
+    //metodo para remover produtos do carrinho
+    public function removeProducts(Product $product, $all = false)
+    {
+        $sql = new Sql();
+        //remove todos os produtos de mesmo id
+        if($all)
+        {
+            //serão removidos todas as quantidades de um mesmo produto
+            $sql->query('UPDATE tb_cartsproducts SET dtremoved = NOW() 
+                        WHERE idcart = :idcart AND idproduct = :idproduct
+                        AND dtremoved IS NULL', [
+                            ':idcart'=>$this->getidcart(),
+                            ':idproduct'=>$product->getidproduct()
+                        ]);
+        }else
+        {
+            //A única diferença será que nesta query será reduzido 
+            //a quantidade do produto em 1
+            $sql->query('UPDATE tb_cartsproducts SET dtremoved = NOW() 
+                        WHERE idcart = :idcart AND idproduct = :idproduct 
+                        AND dtremoved IS NULL LIMIT 1', [
+                            ':idcart'=>$this->getidcart(),
+                            ':idproduct'=>$product->getidproduct()
+                        ]);
+        }
+    }
+
+    //metodo para retornar os produtos que estão em um carrinho
+    public function getProducts()
+    {
+        $sql = new Sql();
+        //Retorna todos os produtos que estão dentro do carrinho e que 
+        //a data de remoção é nula 
+        //A cláusula GROUP BY é utilizada para retornar a quantidade do mesmo
+        //produto dentro da tabela 
+        
+        $rows = $sql->select(
+               'SELECT b.idproduct, b.desproduct, b.vlprice, b.vlwidth, b.vlheight, b.vllength, b.vlweight, b.desurl,
+               COUNT(*) AS nrqtd, SUM(b.vlprice) AS vltotal
+               FROM tb_cartsproducts a 
+               INNER JOIN tb_products b 
+               ON a.idproduct = b.idproduct 
+               WHERE a.idcart = :idcart 
+               AND a.dtremoved IS NULL
+                GROUP BY b.idproduct, b.desproduct, b.vlprice, b.vlwidth, b.vlheight, b.vllength, b.vlweight, b.desurl
+                ORDER BY b.desproduct', [
+                        ':idcart'=>$this->getidcart()
+                        ]);
+
+        //utilizamos tambem o metodo estático checkList da classe produto
+        //para verificar se o produto possui foto e inclui-la nos objetos de produto
+        return Product::checkList($rows);
+
     }
 
 }

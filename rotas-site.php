@@ -85,11 +85,83 @@ $app->get('/products/:desurl', function($desurl)
 //Rota para abrir a página do carrinho de compras
 $app->get('/cart', function()
 {
+
 	$cart = Cart::getFromSession();
 
 	$page = new Page();
 
-	$page->setTpl('cart');
+	$page->setTpl('cart',[
+		'cart'=>$cart->getValues(),
+		'products'=>$cart->getProducts()
+	]);
+});
+
+/////////////////////////////////////////////////////////
+//rota para adicionar produtos ao carrinho
+$app->get('/cart/:idproduct/add', function($idproduct)
+{
+	$product = new Product();
+
+	$product->get((int)$idproduct);
+
+	//recuperando o carrinho da sessão
+	$cart = Cart::getFromSession();
+
+	//verifica quantidade informada na variável qtd do template de detalhe do produto se não for informado nada
+	//qtd será igual a 1
+	$qtd = (isset($_GET['qtd'])) ? (int)$_GET['qtd'] : 1;
+
+	//através do for faremos a inclusão de tantos produtos quanto o valor de qtd for informado
+	for( $i = 0; $i < $qtd; $i++)
+	{
+		//adicionando o produto ao carrinho
+		$cart->addProducts($product);
+	}
+	
+	//uma vez adicionado o produto o usuário será redirecionado para a
+	//pagina do carrinho para ver como ficou
+	header('Location: /cart ');
+	exit;
+});
+
+/////////////////////////////////////////////////////////
+//rota para remover um produto do carrinho
+$app->get('/cart/:idproduct/minus', function($idproduct)
+{
+	$product = new Product();
+
+	$product->get((int)$idproduct);
+
+	//recuperando o carrinho da sessão
+	$cart = Cart::getFromSession();
+
+	//adicionando o produto ao carrinho
+	$cart->removeProducts($product);
+
+	//uma vez adicionado o produto o usuário será redirecionado para a
+	//pagina do carrinho para ver como ficou
+	header('Location: /cart ');
+	exit;
+});
+
+/////////////////////////////////////////////////////////
+//rota para remover todos os produtos de mesmo id do carrinho
+$app->get('/cart/:idproduct/remove', function($idproduct)
+{
+	$product = new Product();
+
+	$product->get((int)$idproduct);
+
+	//recuperando o carrinho da sessão
+	$cart = Cart::getFromSession();
+
+	//adicionando o produto ao carrinho
+	$cart->removeProducts($product, true);
+
+	//uma vez adicionado o produto o usuário será redirecionado para a
+	//pagina do carrinho para ver como ficou
+	header('Location: /cart ');
+	exit;
 });
 
 ?>
