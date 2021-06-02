@@ -20,6 +20,55 @@ class User extends Model
     const SECRET = "HcodePhp7_Secret";
 	const SECRET_IV = "HcodePhp7_Secret_IV";
 
+    //metodo para verificar se a sessão já existe
+    public static function getFromSession()
+    {
+        $user = new User();
+
+        if(isset($_SESSION[User::SESSION]) && (int)$_SESSION[User::SESSION]['iduser'] > 0)
+        {           
+            $user->setData($_SESSION[User::SESSION]);        
+        }
+
+        return $user;
+    }
+
+    //metodo pra checar se o usuario está logado
+    //sem retornar nenhuma página 
+    public static function checkLogin($inadmin = true)
+    {
+         /**verifica se a sessão não foi definida
+         * , se não é falsa, se o id do usuário não existe,
+         * e se ele não é um administrador e redireciona
+         * para a tela de login
+         * */
+        if(
+            !isset($_SESSION[User::SESSION])
+            ||
+            !$_SESSION[User::SESSION]
+            ||
+            !(int)$_SESSION[User::SESSION]["iduser"] > 0
+        ){
+            //não está logado
+            return false;
+        }else{
+            //irá verificar se o usuário está logado como
+            //administrador
+            if($inadmin === true && (bool)$_SESSION[User::SESSION]['inadmin'] === true)
+            {
+                return true;
+            }else if($inadmin === false){
+                //o usuário está logado mas não é um administrador
+                return true;
+            }else {
+                //se algo for diferente desta logica
+                //o usuáario não está logado
+                return false;
+            }
+
+        }
+    }
+
     public static function login($login, $password)
     {
         //vamos acessar o banco de dados 
@@ -73,21 +122,10 @@ class User extends Model
     //função que verifica se o usuário continua logado 
     public static function verifyLogin($inadmin = true)
     {
-        /**verifica se a sessão não foi definida
-         * , se não é falsa, se o id do usuário não existe,
-         * e se ele não é um administrador e redireciona
-         * para a tela de login
-         * */
        
-        if(
-            !isset($_SESSION[User::SESSION])
-            ||
-            !$_SESSION[User::SESSION]
-            ||
-            !(int)$_SESSION[User::SESSION]["iduser"] > 0
-            ||
-            (bool)$_SESSION[User::SESSION]["inadmin"] !== $inadmin
-            )
+       //utilizamos o metodo checklogin que não redireciona
+       //validamos e depois redirecionamos
+        if(User::checkLogin($inadmin))
         {
             header("Location: /admin/login");
             exit;

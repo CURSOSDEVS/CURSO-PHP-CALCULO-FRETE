@@ -3,6 +3,7 @@
 use \Hcode\Page;
 use \Hcode\Model\Product;
 use \Hcode\Model\Category;
+use \Hcode\Model\Cart;
 
 //inicio da primeira rota
 $app->get('/', function() {
@@ -78,7 +79,17 @@ $app->get('/products/:desurl', function($desurl)
 		
 	]);
 
-}
-);
+});
+
+///////////////////////////////////////////////////////////////
+//Rota para abrir a página do carrinho de compras
+$app->get('/cart', function()
+{
+	$cart = Cart::getFromSession();
+
+	$page = new Page();
+
+	$page->setTpl('cart');
+});
 
 ?>
