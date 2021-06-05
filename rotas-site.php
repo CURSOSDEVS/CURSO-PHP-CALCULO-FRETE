@@ -90,9 +90,15 @@ $app->get('/cart', function()
 
 	$page = new Page();
 
+	//var_dump($cart->getProducts());
+	//exit;
+	
+
 	$page->setTpl('cart',[
 		'cart'=>$cart->getValues(),
-		'products'=>$cart->getProducts()
+		'products'=>$cart->getProducts(),
+		//passa a mensagem de erro para o template caso exista
+		'error'=>Cart::getMsgError()
 	]);
 });
 
@@ -117,6 +123,9 @@ $app->get('/cart/:idproduct/add', function($idproduct)
 		//adicionando o produto ao carrinho
 		$cart->addProducts($product);
 	}
+	//var_dump($product);
+	//var_dump($cart);
+	//exit;
 	
 	//uma vez adicionado o produto o usuário será redirecionado para a
 	//pagina do carrinho para ver como ficou
@@ -161,6 +170,18 @@ $app->get('/cart/:idproduct/remove', function($idproduct)
 	//uma vez adicionado o produto o usuário será redirecionado para a
 	//pagina do carrinho para ver como ficou
 	header('Location: /cart ');
+	exit;
+});
+
+//////////////////////////////////////////////////////
+//Rota para calcular o valor do frete de acordo com o CEP informado
+$app->post('/cart/freight', function()
+{
+	$cart = Cart::getFromSession();
+
+	$cart->setFreight($_POST['zipcode']);
+
+	header('Location: /cart');
 	exit;
 });
 

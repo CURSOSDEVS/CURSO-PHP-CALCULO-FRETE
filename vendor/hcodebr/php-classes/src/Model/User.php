@@ -122,10 +122,8 @@ class User extends Model
     //função que verifica se o usuário continua logado 
     public static function verifyLogin($inadmin = true)
     {
-       
-       //utilizamos o metodo checklogin que não redireciona
-       //validamos e depois redirecionamos
-        if(User::checkLogin($inadmin))
+        
+        if(!User::checkLogin($inadmin))
         {
             header("Location: /admin/login");
             exit;
